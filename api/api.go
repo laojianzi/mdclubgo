@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+
+	"github.com/laojianzi/mdclubgo/conf"
 )
 
 // App api server
@@ -16,16 +18,21 @@ type App struct {
 
 var fiberApp = new(App)
 
+var defaultFiberConfig = fiber.Config{
+	ServerHeader:         "MDClubGo",
+	ReadTimeout:          5 * time.Second,
+	WriteTimeout:         10 * time.Second,
+	CompressedFileSuffix: ".mdclubgo.gz",
+}
+
 // Server return a api.App
 func Server() *App {
 	fiberApp.once.Do(func() {
-		fiberApp.server = fiber.New(fiber.Config{
-			ServerHeader:         "MDClubGo",
-			ReadTimeout:          5 * time.Second,
-			WriteTimeout:         10 * time.Second,
-			CompressedFileSuffix: ".mdclubgo.gz",
-		})
+		if conf.App.Name != "" {
+			defaultFiberConfig.ServerHeader = conf.App.Name
+		}
 
+		fiberApp.server = fiber.New(defaultFiberConfig)
 		fiberApp.route()
 	})
 
