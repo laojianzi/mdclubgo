@@ -33,6 +33,12 @@ func Server() *App {
 		}
 
 		fiberApp.server = fiber.New(defaultFiberConfig)
+		if conf.Server.HTTPSEnable {
+			if err := fiberApp.server.Server().AppendCert(conf.Server.CertFile, conf.Server.KeyFile); err != nil {
+				panic("can't read cert file and key file")
+			}
+		}
+
 		fiberApp.route()
 	})
 

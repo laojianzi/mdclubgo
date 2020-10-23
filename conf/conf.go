@@ -47,5 +47,10 @@ func Init() error {
 		return fmt.Errorf("mapping default section: %w", err)
 	}
 
+	// server settings
+	if err = Source.Section("server").MapTo(&Server); err != nil {
+		return fmt.Errorf("mapping [server[ section: %w", err)
+	}
+
 	return nil
 }

@@ -2,3 +2,10 @@
 .idea
 go.sum
 custom/
+/mdclubgo
+*.exe
+*.exe~
+*.pem
+*.db
+*.log
+.DS_Store

@@ -14,7 +14,9 @@ func main() {
 	}
 
 	log.Init()
-	if err := api.Server().Start(":8080"); err != nil {
+
+	addr := fmt.Sprintf("%s:%s", conf.Server.HTTPAddr, conf.Server.HTTPPort)
+	if err := api.Server().Start(addr); err != nil {
 		log.Fatal("api start error: %s", err.Error())
 	}
 
