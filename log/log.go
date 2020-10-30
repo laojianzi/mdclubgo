@@ -63,6 +63,7 @@ func Init() {
 	}
 
 	instance = zap.New(zapcore.NewCore(encoder, syncer, level), zap.AddCaller()).Sugar().Named(conf.App.Name)
+	initPrinter(instance)
 }
 
 // Close log sync and remove instance
