@@ -5,6 +5,7 @@ import (
 
 	"github.com/laojianzi/mdclubgo/api"
 	"github.com/laojianzi/mdclubgo/conf"
+	"github.com/laojianzi/mdclubgo/db"
 	"github.com/laojianzi/mdclubgo/log"
 )
 
@@ -14,11 +15,13 @@ func main() {
 	}
 
 	log.Init()
+	db.Init()
 
 	addr := fmt.Sprintf("%s:%s", conf.Server.HTTPAddr, conf.Server.HTTPPort)
 	if err := api.Server().Start(addr); err != nil {
 		log.Fatal("api start error: %s", err.Error())
 	}
 
+	db.Close()
 	log.Close()
 }

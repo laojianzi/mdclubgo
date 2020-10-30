@@ -54,5 +54,10 @@ func Init() error {
 		return fmt.Errorf("mapping [log] section: %w", err)
 	}
 
+	// database settings
+	if err = Source.Section("database").MapTo(&Database); err != nil {
+		return fmt.Errorf("mapping [database] section: %w", err)
+	}
+
 	return nil
 }
