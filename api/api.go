@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/laojianzi/mdclubgo/conf"
+	"github.com/laojianzi/mdclubgo/log"
 )
 
 // App api server
@@ -35,7 +36,7 @@ func Server() *App {
 		fiberApp.server = fiber.New(defaultFiberConfig)
 		if conf.Server.HTTPSEnable {
 			if err := fiberApp.server.Server().AppendCert(conf.Server.CertFile, conf.Server.KeyFile); err != nil {
-				panic("can't read cert file and key file")
+				log.Fatal("can't read cert file and key file")
 			}
 		}
 

@@ -3,7 +3,6 @@ package conf
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 
@@ -34,11 +33,9 @@ func Init() error {
 		return fmt.Errorf("get absolute path: %w", err)
 	}
 
-	CustomConf = customConf
-
 	file, err := os.Stat(customConf)
 	if err != nil || file.IsDir() {
-		log.Printf("Custom config %q not found. Ignore this warning if you're running for the first time", customConf)
+		panic(fmt.Sprintf("Custom config %q not found. Ignore this warning if you're running for the first time", customConf))
 	} else if err = Source.Append(customConf); err != nil {
 		return fmt.Errorf("append %q: %w", customConf, err)
 	}
@@ -49,7 +46,12 @@ func Init() error {
 
 	// server settings
 	if err = Source.Section("server").MapTo(&Server); err != nil {
-		return fmt.Errorf("mapping [server[ section: %w", err)
+		return fmt.Errorf("mapping [server] section: %w", err)
+	}
+
+	// log settings
+	if err = Source.Section("log").MapTo(&Log); err != nil {
+		return fmt.Errorf("mapping [log] section: %w", err)
 	}
 
 	return nil

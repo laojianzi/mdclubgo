@@ -1,14 +1,11 @@
 package conf
 
-// CustomConf returns the absolute path of custom configuration file that is used.
-var CustomConf string
-
 var (
 	// App for project basic
 	App struct {
 		Version string `ini:"-"`
 		Name    string
-		Debug   string
+		Debug   bool
 	}
 )
 
@@ -23,3 +20,11 @@ type ServerOpts struct {
 
 // Server settings
 var Server ServerOpts
+
+// LogOpts log options
+type LogOpts struct {
+	RootPath string `ini:"ROOT_PATH"`
+}
+
+// Log settings
+var Log LogOpts
