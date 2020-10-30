@@ -71,3 +71,8 @@ func Close() {
 	_ = instance.Sync()
 	instance = nil
 }
+
+// ShowLine Line number display switch
+func ShowLine(show bool) *zap.SugaredLogger {
+	return instance.Desugar().WithOptions(zap.WithCaller(false)).Sugar()
+}
