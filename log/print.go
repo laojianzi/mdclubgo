@@ -1,37 +1,33 @@
 package log
 
-// Info uses zap.SugaredLogger.Infof to log a formatd message.
-func Info(format string, args ...interface{}) {
-	instance.Infof(format, args...)
+// print func
+var (
+	Info   func(string, ...interface{})
+	Debug  func(string, ...interface{})
+	Warn   func(string, ...interface{})
+	Error  func(string, ...interface{})
+	DPanic func(string, ...interface{})
+	Panic  func(string, ...interface{})
+	Fatal  func(string, ...interface{})
+)
+
+// Printer print func interface list
+type Printer interface {
+	Infof(string, ...interface{})
+	Debugf(string, ...interface{})
+	Warnf(string, ...interface{})
+	Errorf(string, ...interface{})
+	DPanicf(string, ...interface{})
+	Panicf(string, ...interface{})
+	Fatalf(string, ...interface{})
 }
 
-// Debug uses zap.SugaredLogger.Debugf to log a formatd message.
-func Debug(format string, args ...interface{}) {
-	instance.Debugf(format, args...)
-}
-
-// Warn uses zap.SugaredLogger.Warnf to log a formatd message.
-func Warn(format string, args ...interface{}) {
-	instance.Warnf(format, args...)
-}
-
-// Error uses zap.SugaredLogger.Errorf to log a formatd message.
-func Error(format string, args ...interface{}) {
-	instance.Errorf(format, args...)
-}
-
-// DPanic uses zap.SugaredLogger.DPanicf to log a formatd message. In development, the
-// logger then panics. (See DPanicLevel for details.)
-func DPanic(format string, args ...interface{}) {
-	instance.DPanicf(format, args...)
-}
-
-// Panic uses zap.SugaredLogger.Panicf to log a formatd message, then panics.
-func Panic(format string, args ...interface{}) {
-	instance.Panicf(format, args...)
-}
-
-// Fatal uses zap.SugaredLogger.Fatalf to log a formatd message, then calls os.Exit.
-func Fatal(format string, args ...interface{}) {
-	instance.Fatalf(format, args...)
+func initPrinter(p Printer) {
+	Info = p.Infof
+	Debug = p.Debugf
+	Warn = p.Warnf
+	Error = p.Errorf
+	DPanic = p.DPanicf
+	Panic = p.Panicf
+	Fatal = p.Fatalf
 }

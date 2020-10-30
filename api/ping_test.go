@@ -1,16 +1,14 @@
-package api_test
+package api
 
 import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/laojianzi/mdclubgo/api"
 )
 
 func TestPing(t *testing.T) {
-	app := api.Server()
+	app := Server()
 
 	req := httptest.NewRequest("GET", "/ping", nil)
 	resp, _ := app.Test(req)

@@ -6,6 +6,9 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+
+	"github.com/laojianzi/mdclubgo/conf"
+	"github.com/laojianzi/mdclubgo/log"
 )
 
 // App api server
@@ -16,15 +19,26 @@ type App struct {
 
 var fiberApp = new(App)
 
+var defaultFiberConfig = fiber.Config{
+	ServerHeader:         "MDClubGo",
+	ReadTimeout:          5 * time.Second,
+	WriteTimeout:         10 * time.Second,
+	CompressedFileSuffix: ".mdclubgo.gz",
+}
+
 // Server return a api.App
 func Server() *App {
 	fiberApp.once.Do(func() {
-		fiberApp.server = fiber.New(fiber.Config{
-			ServerHeader:         "MDClubGo",
-			ReadTimeout:          5 * time.Second,
-			WriteTimeout:         10 * time.Second,
-			CompressedFileSuffix: ".mdclubgo.gz",
-		})
+		if conf.App.Name != "" {
+			defaultFiberConfig.ServerHeader = conf.App.Name
+		}
+
+		fiberApp.server = fiber.New(defaultFiberConfig)
+		if conf.Server.HTTPSEnable {
+			if err := fiberApp.server.Server().AppendCert(conf.Server.CertFile, conf.Server.KeyFile); err != nil {
+				log.Fatal("can't read cert file and key file")
+			}
+		}
 
 		fiberApp.route()
 	})
