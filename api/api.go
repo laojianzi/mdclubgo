@@ -9,6 +9,7 @@ import (
 
 	"github.com/laojianzi/mdclubgo/conf"
 	"github.com/laojianzi/mdclubgo/log"
+	"github.com/laojianzi/mdclubgo/middleware"
 )
 
 // App api server
@@ -40,6 +41,7 @@ func Server() *App {
 			}
 		}
 
+		fiberApp.server.Use(middleware.CORS())
 		fiberApp.route()
 	})
 

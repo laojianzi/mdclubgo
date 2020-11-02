@@ -11,11 +11,12 @@ var (
 
 // ServerOpts Server options
 type ServerOpts struct {
-	HTTPSEnable bool   `ini:"HTTPS_ENABLE"`
-	HTTPAddr    string `ini:"HTTP_ADDR"`
-	HTTPPort    string `ini:"HTTP_PORT"`
-	CertFile    string
-	KeyFile     string
+	HTTPSEnable              bool   `ini:"HTTPS_ENABLE"`
+	HTTPAddr                 string `ini:"HTTP_ADDR"`
+	HTTPPort                 string `ini:"HTTP_PORT"`
+	CertFile                 string
+	KeyFile                  string
+	AccessControlAllowOrigin string `ini:"ACCESS_CONTROL_ALLOW_ORIGIN"`
 }
 
 // Server settings
