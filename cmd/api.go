@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"os/signal"
 
 	"github.com/laojianzi/mdclubgo/api"
 	"github.com/laojianzi/mdclubgo/conf"
@@ -18,9 +20,18 @@ func main() {
 	db.Init()
 
 	addr := fmt.Sprintf("%s:%s", conf.Server.HTTPAddr, conf.Server.HTTPPort)
-	if err := api.Server().Start(addr); err != nil {
-		log.Fatal("api start error: %s", err.Error())
-	}
+	go func() {
+		if err := api.Server().Start(addr); err != nil {
+			log.Fatal("api start error: %s", err.Error())
+		}
+	}()
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+
+	<-c
+	log.Info("Gracefully shutting down...")
+	_ = api.Server().Shutdown()
 
 	db.Close()
 	log.Close()

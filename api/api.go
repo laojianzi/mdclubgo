@@ -65,6 +65,11 @@ func (app *App) Start(addr string) error {
 	return app.server.Listen(addr)
 }
 
+// Shutdown close api server
+func (app *App) Shutdown() error {
+	return app.server.Shutdown()
+}
+
 // Test send test request to api server
 func (app *App) Test(req *http.Request, msTimeout ...int) (resp *http.Response, err error) {
 	return app.server.Test(req, msTimeout...)
