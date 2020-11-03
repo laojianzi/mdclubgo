@@ -41,7 +41,13 @@ func Server() *App {
 			}
 		}
 
-		fiberApp.server.Use(middleware.Recover(), middleware.Logger(), middleware.CORS(), middleware.Limiter())
+		fiberApp.server.Use(
+			middleware.RequestID(),
+			middleware.Recover(),
+			middleware.Logger(),
+			middleware.CORS(),
+			middleware.Limiter(),
+		)
 		fiberApp.route()
 	})
 
