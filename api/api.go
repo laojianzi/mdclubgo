@@ -49,6 +49,7 @@ func Server() *App {
 			middleware.Limiter(),
 		)
 		fiberApp.route()
+		fiberApp.server.Use(middleware.NotFound) // 404 handle
 	})
 
 	return fiberApp
