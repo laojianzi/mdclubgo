@@ -15,10 +15,15 @@ func Recover() fiber.Handler {
 		// Catch panics
 		defer func() {
 			if r := recover(); r != nil {
+				errorPrint := log.Error
+				if v := RequestIDFromCtx(c); v != "" {
+					errorPrint = log.With("REQUEST-ID", v).Errorf
+				}
+
 				if conf.App.Debug {
-					log.Error("panic recovered: \n%s\n%s\n%s", c.Request().String(), r, zap.Stack("").String)
+					errorPrint("panic recovered: \n%s\n%s\n%s", c.Request().String(), r, zap.Stack("").String)
 				} else {
-					log.Error("panic recovered: \n%s\n%s", r, zap.Stack("").String)
+					errorPrint("panic recovered: \n%s\n%s", r, zap.Stack("").String)
 				}
 
 				err = c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
