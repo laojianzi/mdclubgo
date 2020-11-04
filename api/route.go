@@ -5,5 +5,5 @@ import (
 )
 
 func (app *App) route() {
-	app.server.Get("/ping", ping.Ping)
+	app.server.GET("/ping", ping.Ping)
 }

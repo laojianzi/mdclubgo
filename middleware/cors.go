@@ -3,63 +3,46 @@ package middleware
 import (
 	"strings"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 
 	"github.com/laojianzi/mdclubgo/conf"
-	"github.com/laojianzi/mdclubgo/log"
 )
 
 // AllowHeaders CORS headers Access-Control-Allow-Methods
 var AllowHeaders = []string{
-	fiber.HeaderContentType,
-	fiber.HeaderAccessControlAllowHeaders,
-	fiber.HeaderAccessControlExposeHeaders,
-	fiber.HeaderAuthorization,
-	fiber.HeaderXRequestedWith,
-	fiber.HeaderXRequestID,
-	fiber.HeaderUserAgent,
+	echo.HeaderContentType,
+	echo.HeaderAccessControlAllowHeaders,
+	echo.HeaderAccessControlExposeHeaders,
+	echo.HeaderAuthorization,
+	echo.HeaderXRequestedWith,
+	echo.HeaderXRequestID,
 }
 
 // ExposeHeaders CORS headers Access-Control-Expose-Headers
 var ExposeHeaders = []string{
-	fiber.HeaderCacheControl,
-	fiber.HeaderContentLength,
-	fiber.HeaderExpires,
-	fiber.HeaderLastModified,
-	fiber.HeaderPragma,
-	fiber.HeaderContentType,
-	fiber.HeaderAccessControlAllowHeaders,
-	fiber.HeaderAccessControlExposeHeaders,
-	fiber.HeaderAuthorization,
-	fiber.HeaderXRequestedWith,
-	fiber.HeaderXRequestID,
-	fiber.HeaderUserAgent,
+	echo.HeaderContentLength,
+	echo.HeaderLastModified,
+	echo.HeaderContentType,
+	echo.HeaderAccessControlAllowHeaders,
+	echo.HeaderAccessControlExposeHeaders,
+	echo.HeaderAuthorization,
+	echo.HeaderXRequestedWith,
+	echo.HeaderXRequestID,
 }
 
-// CORS cors settings for fiber handler
-func CORS() fiber.Handler {
-	return func(ctx *fiber.Ctx) error {
-		cors.ConfigDefault.MaxAge = 3600
-		cors.ConfigDefault.AllowHeaders = strings.Join(AllowHeaders, ", ")
-		cors.ConfigDefault.ExposeHeaders = strings.Join(ExposeHeaders, ", ")
-		if conf.Server.AccessControlAllowOrigin != "" {
-			cors.ConfigDefault.AllowOrigins = conf.Server.AccessControlAllowOrigin
-			cors.ConfigDefault.AllowCredentials = true
-		}
-
-		err := cors.New()(ctx)
-		if err != nil {
-			return err
-		}
-
-		origin := ctx.Get(fiber.HeaderOrigin)
-		accessControlAllowOrigin := ctx.Get(fiber.HeaderAccessControlAllowOrigin)
-		if origin != accessControlAllowOrigin {
-			log.Debug("cors %s is '%s' but %s is '%s'", fiber.HeaderOrigin, origin,
-				fiber.HeaderAccessControlAllowOrigin, accessControlAllowOrigin)
-		}
-
-		return nil
+// CORS cors settings for echo handler
+func CORS() echo.MiddlewareFunc {
+	cfg := middleware.CORSConfig{
+		AllowHeaders:  AllowHeaders,
+		ExposeHeaders: ExposeHeaders,
+		MaxAge:        3600,
 	}
+
+	if conf.Server.AccessControlAllowOrigin != "" {
+		cfg.AllowOrigins = strings.Split(strings.TrimSpace(conf.Server.AccessControlAllowOrigin), ",")
+		cfg.AllowCredentials = true
+	}
+
+	return middleware.CORSWithConfig(cfg)
 }

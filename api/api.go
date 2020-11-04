@@ -1,76 +1,81 @@
 package api
 
 import (
+	"context"
 	"net/http"
 	"sync"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
+	echolog "github.com/labstack/gommon/log"
 
 	"github.com/laojianzi/mdclubgo/conf"
 	"github.com/laojianzi/mdclubgo/log"
 	"github.com/laojianzi/mdclubgo/middleware"
 )
 
+var instance = new(App)
+
 // App api server
 type App struct {
-	server *fiber.App
+	server *echo.Echo
 	once   sync.Once
-}
-
-var fiberApp = new(App)
-
-var defaultFiberConfig = fiber.Config{
-	ServerHeader:         "MDClubGo",
-	ReadTimeout:          5 * time.Second,
-	WriteTimeout:         10 * time.Second,
-	CompressedFileSuffix: ".mdclubgo.gz",
 }
 
 // Server return a api.App
 func Server() *App {
-	fiberApp.once.Do(func() {
+	instance.once.Do(func() {
+		instance.server = echo.New()
+
 		if conf.App.Name != "" {
-			defaultFiberConfig.ServerHeader = conf.App.Name
+			instance.server.Logger.SetPrefix(conf.App.Name)
 		}
 
-		fiberApp.server = fiber.New(defaultFiberConfig)
-		if conf.Server.HTTPSEnable {
-			if err := fiberApp.server.Server().AppendCert(conf.Server.CertFile, conf.Server.KeyFile); err != nil {
-				log.Fatal("can't read cert file and key file")
-			}
+		instance.server.Logger.SetOutput(log.Output())
+		level := echolog.INFO
+		if conf.App.Debug {
+			level = echolog.DEBUG
 		}
 
-		fiberApp.server.Use(
+		instance.server.Logger.SetLevel(level)
+		instance.server.Debug = conf.App.Debug
+		instance.server.HideBanner = false
+		instance.server.Server.ReadTimeout = 5 * time.Second
+		instance.server.Server.WriteTimeout = 10 * time.Second
+		instance.server.HTTPErrorHandler = middleware.ErrorHandler
+		instance.server.Pre(middleware.RemoveTrailingSlash())
+
+		instance.server.Use(
 			middleware.RequestID(),
 			middleware.Recover(),
 			middleware.Logger(),
 			middleware.CORS(),
 			middleware.Limiter(),
 		)
-		fiberApp.route()
-		fiberApp.server.Use(middleware.NotFound) // 404 handle
+
+		instance.route()
 	})
 
-	return fiberApp
-}
-
-// Add add handler to api server
-func (app *App) Add(method string, path string, handlers ...fiber.Handler) fiber.Router {
-	return app.server.Add(method, path, handlers...)
+	return instance
 }
 
 // Start listen api server
 func (app *App) Start(addr string) error {
-	return app.server.Listen(addr)
+	if conf.Server.HTTPSEnable {
+		if err := instance.server.StartTLS(addr, conf.Server.CertFile, conf.Server.KeyFile); err != nil {
+			log.Fatal("can't read cert file and key file")
+		}
+	}
+
+	return app.server.Start(addr)
 }
 
 // Shutdown close api server
-func (app *App) Shutdown() error {
-	return app.server.Shutdown()
+func (app *App) Shutdown(ctx context.Context) error {
+	return app.server.Shutdown(ctx)
 }
 
-// Test send test request to api server
-func (app *App) Test(req *http.Request, msTimeout ...int) (resp *http.Response, err error) {
-	return app.server.Test(req, msTimeout...)
+// NewContext uses echo.Echo.NewContext
+func (app *App) NewContext(r *http.Request, w http.ResponseWriter) echo.Context {
+	return app.server.NewContext(r, w)
 }
