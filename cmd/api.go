@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/laojianzi/mdclubgo/api"
 	"github.com/laojianzi/mdclubgo/conf"
@@ -13,7 +15,7 @@ import (
 
 func main() {
 	if err := conf.Init(); err != nil {
-		panic(fmt.Sprintf("Failed to initialize application: %v", err))
+		panic(fmt.Sprintf("failed to initialize application: %v", err))
 	}
 
 	log.Init()
@@ -28,10 +30,13 @@ func main() {
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
-
 	<-c
-	log.Info("Gracefully shutting down...")
-	_ = api.Server().Shutdown()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	if err := api.Server().Shutdown(ctx); err != nil {
+		log.Fatal("api server shutdown error: %s", err.Error())
+	}
+	cancel()
 
 	db.Close()
 	log.Close()

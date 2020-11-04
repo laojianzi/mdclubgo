@@ -1,6 +1,7 @@
 package log
 
 import (
+	"io"
 	"os"
 	"path/filepath"
 
@@ -12,6 +13,8 @@ import (
 )
 
 var instance *zap.SugaredLogger
+
+var output zapcore.WriteSyncer
 
 // Init log instance
 func Init() {
@@ -31,7 +34,7 @@ func Init() {
 		}))
 	}
 
-	syncer := zapcore.NewMultiWriteSyncer(ws...)
+	output = zapcore.NewMultiWriteSyncer(ws...)
 	encoderLevel := zapcore.CapitalColorLevelEncoder
 	if !conf.App.Debug {
 		encoderLevel = zapcore.CapitalLevelEncoder
@@ -62,7 +65,7 @@ func Init() {
 		encoder = zapcore.NewJSONEncoder(encoderConfig)
 	}
 
-	instance = zap.New(zapcore.NewCore(encoder, syncer, level), zap.AddCaller()).Sugar().Named(conf.App.Name)
+	instance = zap.New(zapcore.NewCore(encoder, output, level), zap.AddCaller()).Sugar().Named(conf.App.Name)
 	initPrinter(instance)
 }
 
@@ -73,6 +76,11 @@ func Close() {
 }
 
 // ShowLine Line number display switch
-func ShowLine(show bool) *zap.SugaredLogger {
-	return instance.Desugar().WithOptions(zap.WithCaller(false)).Sugar()
+func ShowLine(enable bool) *zap.SugaredLogger {
+	return instance.Desugar().WithOptions(zap.WithCaller(enable)).Sugar()
+}
+
+// Output return a log io.Writer
+func Output() io.Writer {
+	return output
 }

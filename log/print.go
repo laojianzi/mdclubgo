@@ -31,8 +31,3 @@ func initPrinter(p Printer) {
 	Panic = p.Panicf
 	Fatal = p.Fatalf
 }
-
-// With uses *zap.SugaredLogger.With
-func With(field ...interface{}) Printer {
-	return instance.With(field...)
-}

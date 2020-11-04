@@ -1,39 +1,42 @@
 package middleware
 
 import (
-	"github.com/gofiber/fiber/v2"
-	"go.uber.org/zap"
+	"fmt"
+	"runtime"
 
-	"github.com/laojianzi/mdclubgo/conf"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+
 	"github.com/laojianzi/mdclubgo/log"
 )
 
-// Recover recover settings for fiber handler
-func Recover() fiber.Handler {
-	// Return new handler
-	return func(c *fiber.Ctx) (err error) {
-		// Catch panics
-		defer func() {
-			if r := recover(); r != nil {
-				errorPrint := log.Error
-				if v := RequestIDFromCtx(c); v != "" {
-					errorPrint = log.With("REQUEST-ID", v).Errorf
+// Recover recover settings for echo handler
+func Recover() echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(ctx echo.Context) error {
+			defer func() {
+				if r := recover(); r != nil {
+					err, ok := r.(error)
+					if !ok {
+						err = fmt.Errorf("%v", r)
+					}
+
+					stack := make([]byte, middleware.DefaultRecoverConfig.StackSize)
+					length := runtime.Stack(stack, !middleware.DefaultRecoverConfig.DisableStackAll)
+					if !middleware.DefaultRecoverConfig.DisablePrintStack {
+						msg := fmt.Sprintf("[PANIC RECOVER] %v [STACK] %s", err, stack[:length])
+						if requestID := RequestIDFromCtx(ctx); requestID != "" {
+							msg = fmt.Sprintf("[REQUEST-ID] %s\t%s", requestID, msg)
+						}
+
+						log.Error(msg)
+					}
+
+					ctx.Error(err)
 				}
+			}()
 
-				if conf.App.Debug {
-					errorPrint("panic recovered: \n%s\n%s\n%s", c.Request().String(), r, zap.Stack("").String)
-				} else {
-					errorPrint("panic recovered: \n%s\n%s", r, zap.Stack("").String)
-				}
-
-				err = c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-					"code":    100000,
-					"message": "服务器错误",
-				})
-			}
-		}()
-
-		// Return err if exist, else move to next handler
-		return c.Next()
+			return next(ctx)
+		}
 	}
 }

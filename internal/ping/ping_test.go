@@ -2,11 +2,12 @@ package ping_test
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/laojianzi/mdclubgo/api"
+	"github.com/laojianzi/mdclubgo/internal/ping"
 	"github.com/laojianzi/mdclubgo/log"
 )
 
@@ -14,22 +15,19 @@ func TestPing(t *testing.T) {
 	log.Init()
 	defer log.Close()
 
-	app := api.Server()
 	req := httptest.NewRequest("GET", "/ping", nil)
-	resp, _ := app.Test(req)
+	rec := httptest.NewRecorder()
 
-	if resp.StatusCode != 200 {
+	if err := ping.Ping(api.Server().NewContext(req, rec)); err != nil {
+		t.Fatal(err)
+	}
+
+	if rec.Code != http.StatusOK {
 		t.Fatal("response status code not match")
 	}
 
 	result := make(map[string]string)
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = json.Unmarshal(body, &result)
-	if err != nil {
+	if err := json.Unmarshal(rec.Body.Bytes(), &result); err != nil {
 		t.Fatal(err)
 	}
 

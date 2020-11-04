@@ -1,22 +1,24 @@
 package middleware
 
 import (
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/requestid"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
-// RequestID request id settings for fiber handler
-func RequestID() fiber.Handler {
-	return requestid.New()
+// RequestID request id settings for echo handler
+func RequestID() echo.MiddlewareFunc {
+	return middleware.RequestID()
 }
 
-// RequestIDFromCtx get request id from current fiber.Ctx
-func RequestIDFromCtx(ctx *fiber.Ctx) string {
-	value := ctx.Locals(requestid.ConfigDefault.ContextKey)
-	if value == nil {
-		return ""
+// RequestIDFromCtx get request id from current echo.Context
+func RequestIDFromCtx(ctx echo.Context) string {
+	req := ctx.Request()
+	res := ctx.Response()
+
+	id := req.Header.Get(echo.HeaderXRequestID)
+	if id == "" {
+		id = res.Header().Get(echo.HeaderXRequestID)
 	}
 
-	requestID, _ := value.(string)
-	return requestID
+	return id
 }
