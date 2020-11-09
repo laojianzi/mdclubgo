@@ -49,8 +49,12 @@ func Logger() echo.MiddlewareFunc {
 
 			if err != nil {
 				// Error may contain invalid JSON e.g. `"`
-				b, _ := json.Marshal(err.Error())
+				b, jsonErr := json.Marshal(err.Error())
 				b = b[1 : len(b)-1]
+				if jsonErr != nil {
+					b = []byte(err.Error())
+				}
+
 				msg = fmt.Sprintf("%s\t[ERROR] %s", msg, string(b))
 			}
 

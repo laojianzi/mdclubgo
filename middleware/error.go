@@ -19,16 +19,13 @@ func ErrorHandler(err error, ctx echo.Context) {
 		}
 	}
 
-	httpCode := e.Code
 	content := exception.HTTPCodeToMDClubGoError(e.Code)
 	if e.Internal != nil {
 		if mdclubgoErr, ok := e.Internal.(*exception.MDClubGoError); ok {
-			httpCode = e.Code
 			content = mdclubgoErr
 		}
 
 		if herr, ok := e.Internal.(*echo.HTTPError); ok {
-			httpCode = herr.Code
 			content = exception.HTTPCodeToMDClubGoError(herr.Code)
 		}
 	}
@@ -41,7 +38,7 @@ func ErrorHandler(err error, ctx echo.Context) {
 	if ctx.Request().Method == http.MethodHead {
 		err = ctx.NoContent(e.Code)
 	} else {
-		err = ctx.JSON(httpCode, content)
+		err = ctx.JSON(http.StatusOK, content)
 	}
 
 	if err != nil {

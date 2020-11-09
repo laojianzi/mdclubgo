@@ -12,8 +12,8 @@ tasks:
     cmds:
       - go build -v
         -ldflags '
-          -X "{{.PKG_PATH}}.BuildTime={{.BUILD_TIME}}"
-          -X "{{.PKG_PATH}}.BuildCommit={{.BUILD_COMMIT}}"
+        -X "{{.PKG_PATH}}.BuildTime={{.BUILD_TIME}}"
+        -X "{{.PKG_PATH}}.BuildCommit={{.BUILD_COMMIT}}"
         '
         -tags '{{.TAGS}}'
         -trimpath -o mdclubgo cmd/api.go
@@ -28,3 +28,14 @@ tasks:
     desc: Run all tests.
     cmds:
       - go test -cover -race -count=1 ./...
+
+  generate-bindata:
+    desc: Generate bindata for all assets.
+    deps: [clean]
+    cmds:
+      - go generate conf/conf.go
+
+  clean:
+    desc: Cleans up system meta files for code generation.
+    cmds:
+      - find . -name "*.DS_Store" -type f -delete
