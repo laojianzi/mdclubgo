@@ -1,4 +1,4 @@
-package ping_test
+package handle_test
 
 import (
 	"encoding/json"
@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/laojianzi/mdclubgo/api"
-	"github.com/laojianzi/mdclubgo/internal/ping"
+	"github.com/laojianzi/mdclubgo/internal/handle"
 	"github.com/laojianzi/mdclubgo/log"
 )
 
@@ -18,7 +18,7 @@ func TestPing(t *testing.T) {
 	req := httptest.NewRequest("GET", "/ping", nil)
 	rec := httptest.NewRecorder()
 
-	if err := ping.Ping(api.Server().NewContext(req, rec)); err != nil {
+	if err := handle.Ping(api.Server().NewContext(req, rec)); err != nil {
 		t.Fatal(err)
 	}
 

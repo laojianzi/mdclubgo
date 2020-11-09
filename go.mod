@@ -3,6 +3,8 @@ module github.com/laojianzi/mdclubgo
 go 1.13
 
 require (
+	github.com/dchest/captcha v0.0.0-20200903113550-03f5f0333e1f
+	github.com/gomodule/redigo v1.8.2
 	github.com/labstack/echo/v4 v4.1.17
 	github.com/labstack/gommon v0.3.0
 	github.com/smartystreets/goconvey v1.6.4 // indirect

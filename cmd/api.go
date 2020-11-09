@@ -2,12 +2,15 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
 	"github.com/laojianzi/mdclubgo/api"
+	"github.com/laojianzi/mdclubgo/cache"
 	"github.com/laojianzi/mdclubgo/conf"
 	"github.com/laojianzi/mdclubgo/db"
 	"github.com/laojianzi/mdclubgo/log"
@@ -15,15 +18,15 @@ import (
 
 func main() {
 	if err := conf.Init(); err != nil {
-		panic(fmt.Sprintf("failed to initialize application: %v", err))
+		log.Fatal(fmt.Sprintf("failed to initialize application: %v", err))
 	}
 
-	log.Init()
 	db.Init()
+	cache.Init()
 
 	addr := fmt.Sprintf("%s:%s", conf.Server.HTTPAddr, conf.Server.HTTPPort)
 	go func() {
-		if err := api.Server().Start(addr); err != nil {
+		if err := api.Server().Start(addr); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Fatal("api start error: %s", err.Error())
 		}
 	}()
@@ -38,6 +41,7 @@ func main() {
 	}
 	cancel()
 
+	cache.Close()
 	db.Close()
 	log.Close()
 }

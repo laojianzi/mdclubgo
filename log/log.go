@@ -3,28 +3,36 @@ package log
 import (
 	"io"
 	"os"
-	"path/filepath"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
-
-	"github.com/laojianzi/mdclubgo/conf"
 )
 
-var instance *zap.SugaredLogger
-
-var output zapcore.WriteSyncer
+var (
+	instance             *zap.SugaredLogger
+	output               zapcore.WriteSyncer
+	defaultEncoderConfig = zapcore.EncoderConfig{
+		TimeKey:        "TIME",
+		LevelKey:       "LEVEL",
+		NameKey:        "LOGGER",
+		CallerKey:      "LINE",
+		MessageKey:     "MESSAGE",
+		StacktraceKey:  "STACKTRACE",
+		LineEnding:     zapcore.DefaultLineEnding,
+		EncodeLevel:    zapcore.CapitalColorLevelEncoder, // 大写编码器，debug 模式时带颜色
+		EncodeTime:     zapcore.ISO8601TimeEncoder,       // ISO8601 UTC 时间格式
+		EncodeDuration: zapcore.SecondsDurationEncoder,
+		EncodeCaller:   zapcore.ShortCallerEncoder, // 全路径编码器
+		EncodeName:     zapcore.FullNameEncoder,
+	}
+)
 
 // Init log instance
-func Init() {
+func Init(appName, logPath string, debug bool) {
 	ws := []zapcore.WriteSyncer{zapcore.AddSync(os.Stdout)}
 
-	if logPath := conf.Log.RootPath; logPath != "" {
-		if logPath[0] != '/' {
-			logPath = filepath.Join(conf.WorkDir(), logPath)
-		}
-
+	if logPath := logPath; logPath != "" {
 		ws = append(ws, zapcore.AddSync(&lumberjack.Logger{
 			Filename:   logPath,
 			MaxSize:    500,
@@ -35,37 +43,15 @@ func Init() {
 	}
 
 	output = zapcore.NewMultiWriteSyncer(ws...)
-	encoderLevel := zapcore.CapitalColorLevelEncoder
-	if !conf.App.Debug {
-		encoderLevel = zapcore.CapitalLevelEncoder
-	}
-
-	encoderConfig := zapcore.EncoderConfig{
-		TimeKey:        "TIME",
-		LevelKey:       "LEVEL",
-		NameKey:        "LOGGER",
-		CallerKey:      "LINE",
-		MessageKey:     "MESSAGE",
-		StacktraceKey:  "STACKTRACE",
-		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    encoderLevel,               // 大写编码器，debug 模式时带颜色
-		EncodeTime:     zapcore.ISO8601TimeEncoder, // ISO8601 UTC 时间格式
-		EncodeDuration: zapcore.SecondsDurationEncoder,
-		EncodeCaller:   zapcore.ShortCallerEncoder, // 全路径编码器
-		EncodeName:     zapcore.FullNameEncoder,
-	}
-
-	var encoder zapcore.Encoder
-	var level zapcore.Level
-	if conf.App.Debug {
-		level = zap.DebugLevel
-		encoder = zapcore.NewConsoleEncoder(encoderConfig)
-	} else {
+	encoder := zapcore.NewConsoleEncoder(defaultEncoderConfig)
+	level := zap.DebugLevel
+	if !debug {
+		defaultEncoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
 		level = zap.InfoLevel
-		encoder = zapcore.NewJSONEncoder(encoderConfig)
+		encoder = zapcore.NewJSONEncoder(defaultEncoderConfig)
 	}
 
-	instance = zap.New(zapcore.NewCore(encoder, output, level), zap.AddCaller()).Sugar().Named(conf.App.Name)
+	instance = zap.New(zapcore.NewCore(encoder, output, level), zap.AddCaller()).Sugar().Named(appName)
 	initPrinter(instance)
 }
 

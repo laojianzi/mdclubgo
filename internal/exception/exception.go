@@ -20,6 +20,11 @@ const (
 	StatusSysInstallFailed
 )
 
+// define http code for common error
+const (
+	StatusFieldVerifyFailed = iota + 200001
+)
+
 // MDClubGoErrorMessage define error message for mdclubgo
 type MDClubGoErrorMessage string
 
@@ -35,10 +40,16 @@ const (
 	MessageSysInstallFailed    = "系统安装失败"
 )
 
+// define http message for common error
+const (
+	MessageFieldVerifyFailed = "字段验证失败"
+)
+
 // MDClubGoError error for mdclubgo
 type MDClubGoError struct {
 	Code    MDClubGoErrorCode    `json:"code"`
 	Message MDClubGoErrorMessage `json:"message"`
+	Errors  map[string]string    `json:"errors,omitempty"` // map[error_field]error_message pls uses `AddErrors` add
 }
 
 // Error format MDClubGoError to string
@@ -51,7 +62,14 @@ func NewMDClubGoError(code MDClubGoErrorCode, msg MDClubGoErrorMessage) *MDClubG
 	return &MDClubGoError{
 		Code:    code,
 		Message: msg,
+		Errors:  make(map[string]string),
 	}
+}
+
+// AddErrors add to `Errors`
+func (err *MDClubGoError) AddErrors(key, msg string) *MDClubGoError {
+	err.Errors[key] = msg
+	return err
 }
 
 // define http error for system
@@ -64,6 +82,10 @@ var (
 	ErrAPIMethodNotAllowed = NewMDClubGoError(StatusAPIMethodNotAllowed, MessageAPIMethodNotAllowed)
 	ErrBadRequest          = NewMDClubGoError(StatusBadRequest, MessageBadRequest)
 	ErrSysInstallFailed    = NewMDClubGoError(StatusSysInstallFailed, MessageSysInstallFailed)
+)
+
+var (
+	ErrFieldVerifyFailed = NewMDClubGoError(StatusFieldVerifyFailed, MessageFieldVerifyFailed)
 )
 
 var httpCodeToMDClubGoError = map[int]*MDClubGoError{

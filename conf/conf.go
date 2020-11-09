@@ -1,12 +1,16 @@
 package conf
 
+//go:generate go-bindata -nomemcopy -pkg=conf -ignore="\\.DS_Store|README.md|TRANSLATORS" -prefix=../ -debug=false -o=conf_gen.go ../conf/app.ini
+
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
+	"github.com/labstack/gommon/color"
 	"gopkg.in/ini.v1"
+
+	"github.com/laojianzi/mdclubgo/log"
 )
 
 // Source is the configuration object.
@@ -14,14 +18,26 @@ var Source *ini.File
 
 // Init initializes configuration from custom/conf/app.ini
 func Init() error {
-	content, err := ioutil.ReadFile("conf/app.ini")
-	if err != nil {
-		panic("can't read 'conf/app.ini'")
-	}
+	log.Init(App.Name, Log.RootPath, App.Debug)
+
+	var err error
+	defer func() {
+		if err == nil {
+			log.Init(App.Name, Log.RootPath, App.Debug)
+		}
+
+		log.Info(color.Green(fmt.Sprintf("%s %s", App.Name, App.Version)))
+		log.Info(color.Green(fmt.Sprintf("Work directory: %s", WorkDir())))
+		log.Info(color.Green(fmt.Sprintf("Custom path: %s", CustomDir())))
+		log.Info(color.Green(fmt.Sprintf("Custom config: %s", CustomConf)))
+		log.Info(color.Green(fmt.Sprintf("Log path: %s", Log.RootPath)))
+		log.Info(color.Green(fmt.Sprintf("Build time: %s", BuildTime)))
+		log.Info(color.Green(fmt.Sprintf("Build commit: %s", BuildCommit)))
+	}()
 
 	Source, err = ini.LoadSources(ini.LoadOptions{
 		IgnoreInlineComment: true,
-	}, content)
+	}, MustAsset("conf/app.ini"))
 	if err != nil {
 		return fmt.Errorf("parse 'conf/app.ini': %w", err)
 	}
@@ -33,9 +49,10 @@ func Init() error {
 		return fmt.Errorf("get absolute path: %w", err)
 	}
 
+	CustomConf = customConf
 	file, err := os.Stat(customConf)
 	if err != nil || file.IsDir() {
-		panic(fmt.Sprintf("Custom config %q not found. Ignore this warning if you're running for the first time", customConf))
+		log.Warn("Custom config %q not found. Ignore this warning if you're running for the first time", customConf)
 	} else if err = Source.Append(customConf); err != nil {
 		return fmt.Errorf("append %q: %w", customConf, err)
 	}
@@ -54,9 +71,22 @@ func Init() error {
 		return fmt.Errorf("mapping [log] section: %w", err)
 	}
 
+	if Log.RootPath == "" {
+		Log.RootPath = filepath.Join(WorkDir(), "tmp", "mdclubgo.log")
+	}
+
+	if Log.RootPath[0] != '/' {
+		Log.RootPath = filepath.Join(WorkDir(), Log.RootPath)
+	}
+
 	// database settings
 	if err = Source.Section("database").MapTo(&Database); err != nil {
 		return fmt.Errorf("mapping [database] section: %w", err)
+	}
+
+	// cache settings
+	if err = Source.Section("cache").MapTo(&Cache); err != nil {
+		return fmt.Errorf("mapping [cache] section: %w", err)
 	}
 
 	return nil

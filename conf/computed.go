@@ -5,6 +5,8 @@ import (
 	"os/exec"
 	"path/filepath"
 	"sync"
+
+	"github.com/laojianzi/mdclubgo/log"
 )
 
 var (
@@ -18,12 +20,12 @@ func AppPath() string {
 		var err error
 		appPath, err = exec.LookPath(os.Args[0])
 		if err != nil {
-			panic("look executable path: " + err.Error())
+			log.Panic("look executable path: " + err.Error())
 		}
 
 		appPath, err = filepath.Abs(appPath)
 		if err != nil {
-			panic("get absolute executable path: " + err.Error())
+			log.Panic("get absolute executable path: " + err.Error())
 		}
 	})
 

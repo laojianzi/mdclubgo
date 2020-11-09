@@ -1,11 +1,26 @@
 package conf
 
+// Build time and commit information.
+//
+// ⚠️ WARNING: should only be set by "-ldflags".
+var (
+	BuildTime   string
+	BuildCommit string
+)
+
+// CustomConf returns the absolute path of custom configuration file that is used.
+var CustomConf string
+
 var (
 	// App for project basic
-	App struct {
+	App = struct {
 		Version string `ini:"-"`
 		Name    string
 		Debug   bool
+	}{
+		Version: "no version",
+		Name:    "MDClubGo",
+		Debug:   true,
 	}
 )
 
@@ -53,3 +68,15 @@ var (
 	UsePostgreSQL bool
 	UseMSSQL      bool
 )
+
+// CacheOpts cache options
+type CacheOpts struct {
+	Type      string
+	Host      string
+	Namespace string
+	Username  string
+	Password  string
+}
+
+// Cache settings
+var Cache CacheOpts
