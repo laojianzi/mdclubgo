@@ -79,16 +79,12 @@ func (r *Cache) open() *Cache {
 
 // Get return a string value from redis get
 func (r *Cache) Get(key string, defaultV string) string {
-	reply, err := r.client.Do("GET", key)
-	if err != nil {
+	reply, err := redis.String(r.client.Do("GET", key))
+	if err != nil || reply == "" {
 		return defaultV
 	}
 
-	if v, ok := reply.(string); ok {
-		return v
-	}
-
-	return fmt.Sprintf("%v", reply)
+	return reply
 }
 
 // Set set a string value to redis
