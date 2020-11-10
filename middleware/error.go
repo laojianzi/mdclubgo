@@ -11,6 +11,34 @@ import (
 
 // ErrorHandler for echo error handler
 func ErrorHandler(err error, ctx echo.Context) {
+	mdclubgoErr := errorHandle(err)
+
+	// Send response
+	if ctx.Response().Committed {
+		return
+	}
+
+	if ctx.Request().Method == http.MethodHead {
+		code := http.StatusInternalServerError
+		if e, ok := err.(*echo.HTTPError); ok {
+			code = e.Code
+		}
+
+		err = ctx.NoContent(code)
+	} else {
+		err = ctx.JSON(http.StatusOK, mdclubgoErr)
+	}
+
+	if err != nil {
+		log.Error("[REQUEST-ID] %s\t[METHOD] %s\t[URI] %s", RequestIDFromCtx(ctx), ctx.Request().Method, ctx.Request().RequestURI)
+	}
+}
+
+func errorHandle(err error) *exception.MDClubGoError {
+	if mdclubgoErr, ok := err.(*exception.MDClubGoError); ok {
+		return mdclubgoErr
+	}
+
 	e, ok := err.(*echo.HTTPError)
 	if !ok {
 		e = &echo.HTTPError{
@@ -19,29 +47,15 @@ func ErrorHandler(err error, ctx echo.Context) {
 		}
 	}
 
-	content := exception.HTTPCodeToMDClubGoError(e.Code)
 	if e.Internal != nil {
 		if mdclubgoErr, ok := e.Internal.(*exception.MDClubGoError); ok {
-			content = mdclubgoErr
+			return mdclubgoErr
 		}
 
 		if herr, ok := e.Internal.(*echo.HTTPError); ok {
-			content = exception.HTTPCodeToMDClubGoError(herr.Code)
+			return exception.HTTPCodeToMDClubGoError(herr.Code)
 		}
 	}
 
-	// Send response
-	if ctx.Response().Committed {
-		return
-	}
-
-	if ctx.Request().Method == http.MethodHead {
-		err = ctx.NoContent(e.Code)
-	} else {
-		err = ctx.JSON(http.StatusOK, content)
-	}
-
-	if err != nil {
-		log.Error("[REQUEST-ID] %s\t[METHOD] %s\t[URI] %s", RequestIDFromCtx(ctx), ctx.Request().Method, ctx.Request().RequestURI)
-	}
+	return exception.HTTPCodeToMDClubGoError(e.Code)
 }
