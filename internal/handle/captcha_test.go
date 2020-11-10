@@ -20,7 +20,7 @@ func TestNewCaptcha(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	log.Init()
+	log.Init(conf.App.Name, conf.Log.RootPath, conf.App.Debug)
 	defer log.Close()
 	cache.Init()
 	defer cache.Close()

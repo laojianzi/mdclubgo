@@ -7,12 +7,13 @@ import (
 	"testing"
 
 	"github.com/laojianzi/mdclubgo/api"
+	"github.com/laojianzi/mdclubgo/conf"
 	"github.com/laojianzi/mdclubgo/internal/handle"
 	"github.com/laojianzi/mdclubgo/log"
 )
 
 func TestPing(t *testing.T) {
-	log.Init()
+	log.Init(conf.App.Name, conf.Log.RootPath, conf.App.Debug)
 	defer log.Close()
 
 	req := httptest.NewRequest("GET", "/ping", nil)
