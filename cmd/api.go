@@ -13,6 +13,7 @@ import (
 	"github.com/laojianzi/mdclubgo/cache"
 	"github.com/laojianzi/mdclubgo/conf"
 	"github.com/laojianzi/mdclubgo/db"
+	"github.com/laojianzi/mdclubgo/email"
 	"github.com/laojianzi/mdclubgo/log"
 )
 
@@ -23,6 +24,7 @@ func main() {
 
 	db.Init()
 	cache.Init()
+	email.Init()
 
 	addr := fmt.Sprintf("%s:%s", conf.Server.HTTPAddr, conf.Server.HTTPPort)
 	go func() {

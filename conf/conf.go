@@ -31,6 +31,7 @@ func Init() error {
 		log.Info(color.Green(fmt.Sprintf("Custom path: %s", CustomDir())))
 		log.Info(color.Green(fmt.Sprintf("Custom config: %s", CustomConf)))
 		log.Info(color.Green(fmt.Sprintf("Log path: %s", Log.RootPath)))
+		log.Info(color.Green(fmt.Sprintf("Email Use: %s", Email.Type)))
 		log.Info(color.Green(fmt.Sprintf("Build time: %s", BuildTime)))
 		log.Info(color.Green(fmt.Sprintf("Build commit: %s", BuildCommit)))
 	}()
@@ -86,6 +87,11 @@ func Init() error {
 
 	// cache settings
 	if err = Source.Section("cache").MapTo(&Cache); err != nil {
+		return fmt.Errorf("mapping [cache] section: %w", err)
+	}
+
+	// email settings
+	if err = Source.Section("email").MapTo(&Email); err != nil {
 		return fmt.Errorf("mapping [cache] section: %w", err)
 	}
 
