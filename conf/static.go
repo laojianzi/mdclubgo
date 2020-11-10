@@ -80,3 +80,15 @@ type CacheOpts struct {
 
 // Cache settings
 var Cache CacheOpts
+
+// EmailOpts email options
+type EmailOpts struct {
+	Type     string
+	Host     string
+	From     string
+	Username string
+	Password string
+}
+
+// Email settings
+var Email EmailOpts

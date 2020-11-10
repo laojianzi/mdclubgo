@@ -1,0 +1,3 @@
+package template
+
+//go:generate go-bindata -nomemcopy -pkg=template -ignore="\\.DS_Store|README.md|TRANSLATORS" -prefix=../../../ -debug=false -o=template_gen.go ../../../conf/email/...

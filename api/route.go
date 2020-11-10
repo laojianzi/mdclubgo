@@ -7,4 +7,7 @@ import (
 func (app *App) route() {
 	app.server.GET("/ping", handle.Ping)
 	app.server.POST("/api/captchas", handle.NewCaptcha)
+
+	// user
+	app.server.POST("/api/user/register/email", handle.RegisterEmail)
 }

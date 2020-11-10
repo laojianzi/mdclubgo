@@ -34,6 +34,7 @@ tasks:
     deps: [clean]
     cmds:
       - go generate conf/conf.go
+      - go generate internal/email/template/template.go
 
   clean:
     desc: Cleans up system meta files for code generation.
