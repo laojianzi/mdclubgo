@@ -1,5 +1,13 @@
 package conf
 
+import (
+	"os"
+)
+
+var (
+	TestConf = os.Getenv("TEST_CONF")
+)
+
 // Build time and commit information.
 //
 // ⚠️ WARNING: should only be set by "-ldflags".

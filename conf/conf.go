@@ -17,7 +17,7 @@ import (
 var Source *ini.File
 
 // Init initializes configuration from custom/conf/app.ini
-func Init() error {
+func Init(customConf string) error {
 	log.Init(App.Name, Log.RootPath, App.Debug)
 
 	var err error
@@ -44,7 +44,6 @@ func Init() error {
 	}
 
 	Source.NameMapper = ini.SnackCase
-	customConf := filepath.Join(CustomDir(), "conf", "app.ini")
 	customConf, err = filepath.Abs(customConf)
 	if err != nil {
 		return fmt.Errorf("get absolute path: %w", err)

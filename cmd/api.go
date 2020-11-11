@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"errors"
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"time"
 
 	"github.com/laojianzi/mdclubgo/api"
@@ -17,8 +19,13 @@ import (
 	"github.com/laojianzi/mdclubgo/log"
 )
 
+var customConf = flag.
+	String("f", filepath.Join(conf.CustomDir(), "conf", "app.ini"), "input your custom config file path")
+
 func main() {
-	if err := conf.Init(); err != nil {
+	flag.Parse()
+
+	if err := conf.Init(*customConf); err != nil {
 		log.Fatal(fmt.Sprintf("failed to initialize application: %v", err))
 	}
 

@@ -16,7 +16,7 @@ import (
 )
 
 func TestNewCaptcha(t *testing.T) {
-	if err := conf.Init(); err != nil {
+	if err := conf.Init(conf.TestConf); err != nil {
 		t.Fatal(err)
 	}
 
