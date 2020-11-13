@@ -14,7 +14,8 @@ on:
 
 env:
   GOPROXY: "https://proxy.golang.org"
-  DATABASE_PASSWORD: "${{ secrets.DatabasePassword }}"
+  DATABASE_PASSWORD: "${{ secrets.DATABASEPASSWORD }}"
+  CODECOV_TOKEN: "${{ secrets.CODECOV_TOKEN }}"
 
 jobs:
   lint:
@@ -40,8 +41,8 @@ jobs:
         env:
           MYSQL_DATABASE: mdclubgo_test
           MYSQL_USER: mdclubgo_test
-          MYSQL_PASSWORD: ${{ secrets.DatabasePassword }}
-          MYSQL_ROOT_PASSWORD: ${{ secrets.RootPassword }}
+          MYSQL_PASSWORD: ${{ secrets.DATABASEPASSWORD }}
+          MYSQL_ROOT_PASSWORD: ${{ secrets.ROOTPASSWORD }}
         options: >-
           --health-cmd "mysqladmin ping"
           --health-interval 10s
@@ -73,6 +74,7 @@ jobs:
       - name: Upload coverage report to Codecov
         uses: codecov/codecov-action@v1
         with:
+          token: $CODECOV_TOKEN
           file: ./coverage
           flags: unittests
       - name: Cache downloaded modules
