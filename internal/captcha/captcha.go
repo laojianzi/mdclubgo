@@ -23,7 +23,7 @@ import (
 const LifeTime = 3600
 
 // CacheKeyPrefix captcha cache key prefix
-const CacheKeyPrefix = "mdclubgo_captcha_"
+const CacheKeyPrefix = "captcha_"
 
 // Present result struct for captcha
 type Present struct {
