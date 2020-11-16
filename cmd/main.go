@@ -3,13 +3,14 @@ package main
 import (
 	"context"
 	"errors"
-	"flag"
 	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"time"
+
+	"github.com/spf13/cobra"
 
 	"github.com/laojianzi/mdclubgo/api"
 	"github.com/laojianzi/mdclubgo/cache"
@@ -19,13 +20,28 @@ import (
 	"github.com/laojianzi/mdclubgo/log"
 )
 
-var customConf = flag.
-	String("f", filepath.Join(conf.CustomDir(), "conf", "app.ini"), "input your custom config file path")
+var customConf string
 
 func main() {
-	flag.Parse()
+	rootCmd := &cobra.Command{Use: "mdclubgo"}
+	apiCmd := &cobra.Command{
+		Use:   "api",
+		Short: "Run http server for api",
+		Run:   run,
+	}
 
-	if err := conf.Init(*customConf); err != nil {
+	apiCmd.Flags().StringVarP(&customConf, "config-file", "f",
+		filepath.Join(conf.CustomDir(), "conf", "app.ini"),
+		"input your custom config file path")
+
+	rootCmd.AddCommand(apiCmd)
+	if err := rootCmd.Execute(); err != nil {
+		log.Fatal(fmt.Errorf("api cmd execute: %w", err).Error())
+	}
+}
+
+func run(cmd *cobra.Command, args []string) {
+	if err := conf.Init(customConf); err != nil {
 		log.Fatal(fmt.Sprintf("failed to initialize application: %v", err))
 	}
 
@@ -35,7 +51,8 @@ func main() {
 
 	addr := fmt.Sprintf("%s:%s", conf.Server.HTTPAddr, conf.Server.HTTPPort)
 	go func() {
-		if err := api.Server().Start(addr); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		if err := api.Server().Start(addr); err != nil && !errors.Is(err,
+			http.ErrServerClosed) {
 			log.Fatal("api start error: %s", err.Error())
 		}
 	}()

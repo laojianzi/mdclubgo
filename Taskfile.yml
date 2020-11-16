@@ -3,9 +3,9 @@ version: '3'
 tasks:
   api:
     desc: Build the binary and start the api server.
-    deps: [build]
+    deps: [ build ]
     cmds:
-      - ./mdclubgo
+      - ./mdclubgo api
 
   build:
     desc: Build the binary.
@@ -16,7 +16,7 @@ tasks:
         -X "{{.PKG_PATH}}.BuildCommit={{.BUILD_COMMIT}}"
         '
         -tags '{{.TAGS}}'
-        -trimpath -o mdclubgo cmd/api.go
+        -trimpath -o mdclubgo cmd/main.go
     vars:
       PKG_PATH: github.com/laojianzi/mdclubgo/conf
       BUILD_TIME:
@@ -31,7 +31,7 @@ tasks:
 
   generate-bindata:
     desc: Generate bindata for all assets.
-    deps: [clean]
+    deps: [ clean ]
     cmds:
       - go generate conf/conf.go
       - go generate internal/email/template/template.go
