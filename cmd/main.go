@@ -17,6 +17,7 @@ import (
 	"github.com/laojianzi/mdclubgo/conf"
 	"github.com/laojianzi/mdclubgo/db"
 	"github.com/laojianzi/mdclubgo/email"
+	"github.com/laojianzi/mdclubgo/goroutine"
 	"github.com/laojianzi/mdclubgo/log"
 )
 
@@ -50,12 +51,12 @@ func run(cmd *cobra.Command, args []string) {
 	email.Init()
 
 	addr := fmt.Sprintf("%s:%s", conf.Server.HTTPAddr, conf.Server.HTTPPort)
-	go func() {
+	goroutine.Go(func() {
 		if err := api.Server().Start(addr); err != nil && !errors.Is(err,
 			http.ErrServerClosed) {
 			log.Fatal("api start error: %s", err.Error())
 		}
-	}()
+	})
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
