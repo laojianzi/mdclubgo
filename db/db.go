@@ -151,7 +151,7 @@ func Init() {
 		conf.UsePostgreSQL = true
 	case "mysql":
 		conf.UseMySQL = true
-		db = db.Set("gorm:table_options", "ENGINE=InnoDB").Session(&gorm.Session{WithConditions: true})
+		db = db.Set("gorm:table_options", "ENGINE=InnoDB").Session(&gorm.Session{})
 	case "sqlite3":
 		conf.UseSQLite3 = true
 	case "mssql":
