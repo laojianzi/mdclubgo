@@ -100,3 +100,19 @@ type EmailOpts struct {
 
 // Email settings
 var Email EmailOpts
+
+// StorageOpts storage options
+type StorageOpts struct {
+	Type string
+}
+
+// Storage settings
+var Storage StorageOpts
+
+// StorageLocalOpts storage local options
+type StorageLocalOpts struct {
+	URL string
+}
+
+// StorageLocal settings
+var StorageLocal StorageLocalOpts
