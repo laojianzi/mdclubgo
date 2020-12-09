@@ -94,5 +94,22 @@ func Init(customConf string) error {
 		return fmt.Errorf("mapping [cache] section: %w", err)
 	}
 
+	// storage settings
+	if err = Source.Section("storage").MapTo(&Storage); err != nil {
+		return fmt.Errorf("mapping [storage] section: %w", err)
+	}
+
+	var storageV interface{}
+	switch Storage.Type {
+	case "local":
+		storageV = &StorageLocal
+	default:
+		return fmt.Errorf("[storage] TYPE is invalid")
+	}
+
+	if err = Source.Section("storage.local").MapTo(storageV); err != nil {
+		return fmt.Errorf("mapping [storage.local] section: %w", err)
+	}
+
 	return nil
 }

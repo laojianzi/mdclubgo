@@ -9,3 +9,4 @@ custom/
 *.log
 .DS_Store
 tmp/
+public/

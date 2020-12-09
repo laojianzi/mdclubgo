@@ -18,6 +18,7 @@ import (
 	"github.com/laojianzi/mdclubgo/db"
 	"github.com/laojianzi/mdclubgo/email"
 	"github.com/laojianzi/mdclubgo/goroutine"
+	"github.com/laojianzi/mdclubgo/internal/storage"
 	"github.com/laojianzi/mdclubgo/log"
 )
 
@@ -41,7 +42,7 @@ func main() {
 	}
 }
 
-func run(cmd *cobra.Command, args []string) {
+func run(_ *cobra.Command, _ []string) {
 	if err := conf.Init(customConf); err != nil {
 		log.Fatal(fmt.Sprintf("failed to initialize application: %v", err))
 	}
@@ -49,6 +50,7 @@ func run(cmd *cobra.Command, args []string) {
 	db.Init()
 	cache.Init()
 	email.Init()
+	storage.Init()
 
 	addr := fmt.Sprintf("%s:%s", conf.Server.HTTPAddr, conf.Server.HTTPPort)
 	goroutine.Go(func() {
@@ -68,6 +70,7 @@ func run(cmd *cobra.Command, args []string) {
 	}
 	cancel()
 
+	storage.Close()
 	cache.Close()
 	db.Close()
 	log.Close()
