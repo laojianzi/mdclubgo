@@ -3,6 +3,7 @@ package validator
 import (
 	"bytes"
 	"crypto/md5" // nolint:gosec
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -20,6 +21,9 @@ const (
 	MaxTimes       = 20            // 每个邮件验证码最多验证次数
 	CacheKeyPrefix = "email_code_" // email validator cache key prefix
 )
+
+// ErrEmailVerifyExpired check code error `email verify expired`
+var ErrEmailVerifyExpired = errors.New("email verify expired")
 
 // CacheKey get captcha cache key
 func CacheKey(key string) string {
@@ -57,6 +61,25 @@ func CodeInfo(email string) (string, int) {
 	}
 
 	return code, times
+}
+
+// CheckCode check cache code and code
+func CheckCode(email, code string) (bool, error) {
+	cacheCode, times := CodeInfo(email)
+	if cacheCode == "" || times == 0 {
+		return false, nil
+	}
+
+	if times >= MaxTimes {
+		return false, ErrEmailVerifyExpired
+	}
+
+	cacheValue := fmt.Sprintf("%s-%d", cacheCode, times+1)
+	if err := cache.Set(CacheKey(email), cacheValue, LifeTime); err != nil {
+		return false, fmt.Errorf("check code set cache: %w", err)
+	}
+
+	return cacheCode == code, nil
 }
 
 // Send validator email content

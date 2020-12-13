@@ -4,9 +4,11 @@ import (
 	"os"
 )
 
-var (
-	TestConf = os.Getenv("TEST_CONF")
-)
+// TestConf app config path read in ENV
+var TestConf = os.Getenv("TEST_CONF")
+
+// Installed whether the app is installed
+var Installed bool
 
 // Build time and commit information.
 //
@@ -22,13 +24,15 @@ var CustomConf string
 var (
 	// App for project basic
 	App = struct {
-		Version string `ini:"-"`
-		Name    string
-		Debug   bool
+		Version  string `ini:"-"`
+		Name     string
+		Debug    bool
+		IPDBPath string `ini:"IPDB_PATH"`
 	}{
-		Version: "no version",
-		Name:    "MDClubGo",
-		Debug:   true,
+		Version:  "no version",
+		Name:     "MDClubGo",
+		Debug:    true,
+		IPDBPath: "conf/mdclubgo.ipdb",
 	}
 )
 
@@ -40,6 +44,7 @@ type ServerOpts struct {
 	CertFile                 string
 	KeyFile                  string
 	AccessControlAllowOrigin string `ini:"ACCESS_CONTROL_ALLOW_ORIGIN"`
+	SiteStaticURL            string `ini:"SITE_STATIC_URL"`
 }
 
 // Server settings

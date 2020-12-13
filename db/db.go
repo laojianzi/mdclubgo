@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"strings"
@@ -164,6 +165,11 @@ func Init() {
 	_ = db.Raw("SHOW TABLES").Scan(&tables)
 	log.Debug("tbales = %+v", tables)
 	instance = db
+}
+
+// Instance return a opened *gorm.DB
+func Instance() *gorm.DB {
+	return instance.WithContext(context.Background())
 }
 
 // Close sql db connect

@@ -10,4 +10,5 @@ func (app *App) route() {
 
 	// user
 	app.server.POST("/api/user/register/email", handle.RegisterEmail)
+	app.server.POST("/api/users", handle.Register)
 }

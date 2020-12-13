@@ -23,6 +23,11 @@ const (
 // define http code for common error
 const (
 	StatusFieldVerifyFailed = iota + 200001
+	StatusSendEmailFailed
+	StatusEmailVerifyExpired
+	StatusImageUploadFailed
+	StatusImageNotFound
+	StatusVoteTypeError
 )
 
 // MDClubGoErrorMessage define error message for mdclubgo
@@ -42,7 +47,12 @@ const (
 
 // define http message for common error
 const (
-	MessageFieldVerifyFailed = "字段验证失败"
+	MessageFieldVerifyFailed  = "字段验证失败"
+	MessageSendEmailFailed    = "邮件发送失败"
+	MessageEmailVerifyExpired = "邮件验证码已失效"
+	MessageImageUploadFailed  = "图片上传失败"
+	MessageImageNotFound      = "指定图片不存在"
+	MessageVoteTypeError      = "投票类型只能是 up、down 中的一个"
 )
 
 // MDClubGoError error for mdclubgo
@@ -85,7 +95,12 @@ var (
 )
 
 var (
-	ErrFieldVerifyFailed = NewMDClubGoError(StatusFieldVerifyFailed, MessageFieldVerifyFailed)
+	ErrFieldVerifyFailed  = NewMDClubGoError(StatusFieldVerifyFailed, MessageFieldVerifyFailed)
+	ErrSendEmailFailed    = NewMDClubGoError(StatusSendEmailFailed, MessageSendEmailFailed)
+	ErrEmailVerifyExpired = NewMDClubGoError(StatusEmailVerifyExpired, MessageEmailVerifyExpired)
+	ErrImageUploadFailed  = NewMDClubGoError(StatusImageUploadFailed, MessageImageUploadFailed)
+	ErrImageNotFound      = NewMDClubGoError(StatusImageNotFound, MessageImageNotFound)
+	ErrVoteTypeError      = NewMDClubGoError(StatusVoteTypeError, MessageVoteTypeError)
 )
 
 var httpCodeToMDClubGoError = map[int]*MDClubGoError{

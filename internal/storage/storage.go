@@ -26,7 +26,7 @@ func Init() {
 
 	switch typ {
 	case Local:
-		instance = local.New()
+		instance = local.New(local.WithPathPrefix(conf.StorageLocal.URL))
 	default:
 		log.Fatal(fmt.Errorf("unrecognized dialect: %s", typ).Error())
 	}

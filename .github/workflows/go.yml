@@ -68,7 +68,15 @@ jobs:
       - name: Run unit tests
         run: |
           mkdir -p /tmp
-          echo "[database]\nTYPE = mysql\nHOST = 127.0.0.1:3306\nNAME = mdclubgo_test\nUSER = mdclubgo_test\nPASSWORD = $DATABASE_PASSWORD\n" > /tmp/app.ini
+          wget -c https://raw.githubusercontent.com/zhuzhichao/ip-location-zh/master/src/20190703.ipdb -P /tmp/
+          IPDB_PATH=/tmp/20190703.ipdb
+          echo "IPDB_PATH = $IPDB_PATH" >> /tmp/app.ini
+          echo "[database]" >> /tmp/app.ini
+          echo "TYPE = mysql" >> /tmp/app.ini
+          echo "HOST = 127.0.0.1:3306" >> /tmp/app.ini
+          echo "NAME = mdclubgo_test" >> /tmp/app.ini
+          echo "USER = mdclubgo_test" >> /tmp/app.ini
+          echo "PASSWORD = $DATABASE_PASSWORD" >> /tmp/app.ini
           TEST_CONF=/tmp/app.ini go test -v -race -coverprofile=coverage -covermode=atomic ./...
       - name: Upload coverage report to Codecov
         uses: codecov/codecov-action@v1

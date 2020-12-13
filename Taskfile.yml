@@ -27,7 +27,7 @@ tasks:
   test:
     desc: Run all tests.
     cmds:
-      - go test -cover -race -count=1 ./...
+      - TEST_CONF=$(pwd)/custom/conf/app.ini CGO_ENABLED=1 go test -cover -race -count=1 ./...
 
   generate-bindata:
     desc: Generate bindata for all assets.

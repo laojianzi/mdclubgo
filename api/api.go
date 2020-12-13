@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"sync"
 	"time"
@@ -10,6 +11,8 @@ import (
 	echolog "github.com/labstack/gommon/log"
 
 	"github.com/laojianzi/mdclubgo/conf"
+	"github.com/laojianzi/mdclubgo/internal/storage"
+	"github.com/laojianzi/mdclubgo/internal/storage/local"
 	"github.com/laojianzi/mdclubgo/log"
 	"github.com/laojianzi/mdclubgo/middleware"
 )
@@ -54,6 +57,18 @@ func Server() *App {
 		)
 
 		instance.route()
+
+		// static url
+		if conf.Storage.Type == storage.Local {
+			root := conf.StorageLocal.URL
+			if root == "" {
+				root = local.DefaultPathPrefix
+			}
+
+			instance.server.Static(fmt.Sprintf("/%s", conf.Server.SiteStaticURL), root)
+		}
+
+		instance.server.Static("/", "public")
 	})
 
 	return instance

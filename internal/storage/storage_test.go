@@ -6,6 +6,7 @@ import (
 
 	"github.com/laojianzi/mdclubgo/conf"
 	"github.com/laojianzi/mdclubgo/internal/storage/local"
+	"github.com/laojianzi/mdclubgo/log"
 )
 
 func TestInit(t *testing.T) {
@@ -21,7 +22,9 @@ func TestInit(t *testing.T) {
 }
 
 func TestLocal(t *testing.T) {
+	log.Init(conf.App.Name, conf.Log.RootPath, conf.App.Debug)
 	conf.Storage.Type = Local
+	conf.StorageLocal.URL = "../../public/upload/"
 	Init()
 
 	path := "tmp/storage_test_local.png"
