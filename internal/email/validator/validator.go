@@ -66,10 +66,11 @@ func CodeInfo(email string) (string, int) {
 // CheckCode check cache code and code
 func CheckCode(email, code string) (bool, error) {
 	cacheCode, times := CodeInfo(email)
-	if cacheCode == "" || times == 0 {
+	if cacheCode == "" {
 		return false, nil
 	}
 
+	log.Debug("cacheCode = %s; times = %d", cacheCode, times)
 	if times >= MaxTimes {
 		return false, ErrEmailVerifyExpired
 	}

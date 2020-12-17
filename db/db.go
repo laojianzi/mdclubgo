@@ -147,7 +147,8 @@ func Init() {
 	sqlDB.SetMaxIdleConns(conf.Database.MaxIdleConns)
 	sqlDB.SetConnMaxLifetime(time.Minute)
 
-	switch conf.Database.Type {
+	typ := strings.ToLower(strings.TrimSpace(conf.Database.Type))
+	switch typ {
 	case "postgres":
 		conf.UsePostgreSQL = true
 	case "mysql":
@@ -158,12 +159,9 @@ func Init() {
 	case "mssql":
 		conf.UseMSSQL = true
 	default:
-		log.Fatal("unreachable")
+		log.Fatal("email type unrecognized dialect: %s", typ)
 	}
 
-	var tables []string
-	_ = db.Raw("SHOW TABLES").Scan(&tables)
-	log.Debug("tbales = %+v", tables)
 	instance = db
 }
 
