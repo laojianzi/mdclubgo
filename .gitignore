@@ -9,4 +9,7 @@ custom/
 *.log
 .DS_Store
 tmp/
-public/
+public/tmp
+public/upload/*
+conf/mdclubgo.ipdb
+data/

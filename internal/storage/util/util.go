@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"github.com/disintegration/imaging"
+
+	"github.com/laojianzi/mdclubgo/log"
 )
 
 func GetThumbLocation(location, size string) string {
@@ -61,6 +63,8 @@ func CROP(reader io.Reader, location string, thumbs map[string][2]int,
 		if err = callback(cropLocation, buf); err != nil {
 			return fmt.Errorf("callback: %w", err)
 		}
+
+		log.Debug("write avatar to '%s'", cropLocation)
 	}
 
 	return nil

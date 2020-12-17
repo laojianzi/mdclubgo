@@ -5,12 +5,16 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/afero"
 
 	"github.com/laojianzi/mdclubgo/internal/storage/util"
+	"github.com/laojianzi/mdclubgo/log"
 )
+
+const DefaultPathPrefix = "public/upload/"
 
 // Local storage
 type Local struct {
@@ -19,15 +23,27 @@ type Local struct {
 }
 
 func (l Local) applyPathPrefix(path string) string {
-	return fmt.Sprintf("%s%s", l.pathPrefix, strings.Trim(path, "\\/"))
+	v := fmt.Sprintf("%s%s", l.pathPrefix, strings.Trim(path, "\\/"))
+	localPath, err := filepath.Abs(v)
+	if err != nil {
+		localPath = v
+	}
+
+	return localPath
 }
 
 // New return a *Local
-func New() *Local {
-	return &Local{
-		pathPrefix: "../../public/upload/",
+func New(opts ...Option) *Local {
+	l := &Local{
+		pathPrefix: DefaultPathPrefix,
 		fs:         &afero.Afero{Fs: afero.NewOsFs()},
 	}
+
+	for _, opt := range opts {
+		opt(l)
+	}
+
+	return l
 }
 
 // Read data from local
@@ -54,8 +70,8 @@ func (l *Local) Write(path string, reader io.Reader, thumbs map[string][2]int) e
 		return fmt.Errorf("afero write reader: %w", err)
 	}
 
-	return util.CROP(ioutil.NopCloser(bytes.NewBuffer(buf)), location, thumbs, func(path string,
-		reader io.Reader) error {
+	log.Debug("write avatar to '%s'", location)
+	return util.CROP(ioutil.NopCloser(bytes.NewBuffer(buf)), location, thumbs, func(path string, reader io.Reader) error {
 		return l.fs.WriteReader(path, reader)
 	})
 }

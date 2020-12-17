@@ -13,6 +13,10 @@ import (
 )
 
 func TestPing(t *testing.T) {
+	if err := conf.Init(conf.TestConf); err != nil {
+		t.Fatal(err)
+	}
+
 	log.Init(conf.App.Name, conf.Log.RootPath, conf.App.Debug)
 	defer log.Close()
 
