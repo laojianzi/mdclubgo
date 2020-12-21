@@ -93,7 +93,7 @@ func confAppIni() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "conf/app.ini", size: 2079, mode: os.FileMode(420), modTime: time.Unix(1607917828, 0)}
+	info := bindataFileInfo{name: "conf/app.ini", size: 2079, mode: os.FileMode(420), modTime: time.Unix(1608538558, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

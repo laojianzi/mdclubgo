@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/laojianzi/mdclubgo/cache"
+	"github.com/laojianzi/mdclubgo/conf"
 	"github.com/laojianzi/mdclubgo/db"
 	"github.com/laojianzi/mdclubgo/internal/avatar"
 	"github.com/laojianzi/mdclubgo/internal/database"
@@ -37,9 +38,11 @@ func Register(ctx echo.Context) error {
 	}
 
 	user.Password = ""
-	// unset($user['password']);
-
-	// TODO: 发送欢迎邮件
+	err = register.Send(user.Email, conf.App.Name, user.Username)
+	if err != nil {
+		log.Error(fmt.Errorf("send register email: %w", err).Error())
+		return exception.ErrInternalServerError
+	}
 
 	// delete user throttle cache
 	key := fmt.Sprintf("throttle_create_token_%s", web.IPSign(ctx))
