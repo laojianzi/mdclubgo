@@ -37,3 +37,8 @@ func Init() {
 func Send(to []string, msg string) error {
 	return instance.Send(to, msg)
 }
+
+// SetTestMailer set instance for testing
+func SetTestMailer(mailer Mailer) {
+	instance = mailer
+}

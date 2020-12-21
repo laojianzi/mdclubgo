@@ -14,6 +14,7 @@ import (
 	"github.com/laojianzi/mdclubgo/cache"
 	"github.com/laojianzi/mdclubgo/conf"
 	"github.com/laojianzi/mdclubgo/db"
+	"github.com/laojianzi/mdclubgo/email"
 	"github.com/laojianzi/mdclubgo/internal/database"
 	"github.com/laojianzi/mdclubgo/internal/email/validator"
 	"github.com/laojianzi/mdclubgo/internal/handle"
@@ -22,6 +23,12 @@ import (
 	"github.com/laojianzi/mdclubgo/internal/storage"
 	"github.com/laojianzi/mdclubgo/log"
 )
+
+type mockMailer struct{}
+
+func (mockMailer) Send(to []string, msg string) error {
+	return nil
+}
 
 func TestRegister(t *testing.T) {
 	if err := conf.Init(conf.TestConf); err != nil {
@@ -39,18 +46,19 @@ func TestRegister(t *testing.T) {
 	storage.Init()
 	defer storage.Close()
 
-	email := "laojianzi@github.com"
-	code := validator.GenerateCode(email)
+	emailField := "laojianzi@github.com"
+	code := validator.GenerateCode(emailField)
 	defer func() {
-		_ = cache.Delete(validator.CacheKey(email))
+		_ = cache.Delete(validator.CacheKey(emailField))
 	}()
 
 	username := "laojianzi"
-	jsonBody := `{"email":"` + email + `","email_code":"` + code +
+	jsonBody := `{"email":"` + emailField + `","email_code":"` + code +
 		`","username":"` + username + `","password":"test-password"}`
 	req := httptest.NewRequest("POST", "/api/users", strings.NewReader(jsonBody))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
+	email.SetTestMailer(new(mockMailer))
 
 	if err := handle.Register(api.Server().NewContext(req, rec)); err != nil {
 		t.Fatal(err)
@@ -67,7 +75,7 @@ func TestRegister(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if data.Email != email {
+	if data.Email != emailField {
 		t.Fatalf("response body 'email' want: %s; got: %s", username, data.Email)
 	}
 
