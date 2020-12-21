@@ -7,3 +7,7 @@ coverage:
 
 comment:
   layout: 'diff'
+
+ignore:
+  - "**/*_gen.go"
+  - "**/*.tmpl"
