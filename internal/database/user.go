@@ -50,6 +50,10 @@ func (User) TableName() string {
 	return WithTablePrefix("user")
 }
 
+func (User) PrimaryKey() string {
+	return "user_id"
+}
+
 // BeforeCreate before create action for user
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 	u.Password, err = passwordHash(u.Password)

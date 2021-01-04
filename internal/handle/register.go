@@ -25,6 +25,11 @@ func Register(ctx echo.Context) error {
 		return exception.ErrBadRequest
 	}
 
+	// validate form data
+	if respErr := form.Validate(); respErr != nil {
+		return respErr
+	}
+
 	user, err := database.Register(db.Instance(), ctx, form.Username, form.Email, form.Password)
 	if err != nil {
 		log.Error(fmt.Errorf("register user and save to db: %w", err).Error())
