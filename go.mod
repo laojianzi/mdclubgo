@@ -10,7 +10,7 @@ require (
 	github.com/labstack/gommon v0.3.0
 	github.com/laojianzi/mdavatar v1.0.1
 	github.com/spf13/afero v1.5.1
-	github.com/spf13/cobra v1.1.1
+	github.com/spf13/cobra v1.1.3
 	github.com/wangtuanjie/ip17mon v1.5.2
 	go.uber.org/zap v1.16.0
 	golang.org/x/crypto v0.0.0-20201208171446-5f87f3452ae9
