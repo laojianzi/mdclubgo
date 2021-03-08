@@ -6,7 +6,7 @@ require (
 	github.com/dchest/captcha v0.0.0-20200903113550-03f5f0333e1f
 	github.com/disintegration/imaging v1.6.2
 	github.com/gomodule/redigo v1.8.3
-	github.com/labstack/echo/v4 v4.1.17
+	github.com/labstack/echo/v4 v4.2.1
 	github.com/labstack/gommon v0.3.0
 	github.com/laojianzi/mdavatar v1.0.1
 	github.com/spf13/afero v1.5.1
