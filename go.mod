@@ -13,13 +13,13 @@ require (
 	github.com/spf13/cobra v1.1.1
 	github.com/wangtuanjie/ip17mon v1.5.2
 	go.uber.org/zap v1.16.0
-	golang.org/x/crypto v0.0.0-20201208171446-5f87f3452ae9
+	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 	golang.org/x/time v0.0.0-20201208040808-7e3f01d25324
 	gopkg.in/ini.v1 v1.62.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	gorm.io/driver/mysql v1.0.4
-	gorm.io/driver/postgres v1.0.8
+	gorm.io/driver/postgres v1.1.0
 	gorm.io/driver/sqlite v1.1.4
 	gorm.io/driver/sqlserver v1.0.6
-	gorm.io/gorm v1.20.12
+	gorm.io/gorm v1.21.9
 )
