@@ -12,7 +12,7 @@ require (
 	github.com/spf13/afero v1.5.1
 	github.com/spf13/cobra v1.1.1
 	github.com/wangtuanjie/ip17mon v1.5.2
-	go.uber.org/zap v1.16.0
+	go.uber.org/zap v1.18.1
 	golang.org/x/crypto v0.0.0-20201208171446-5f87f3452ae9
 	golang.org/x/time v0.0.0-20201208040808-7e3f01d25324
 	gopkg.in/ini.v1 v1.62.0
